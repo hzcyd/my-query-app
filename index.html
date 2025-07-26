@@ -152,7 +152,8 @@
 
             <div class="bg-white rounded-xl shadow-md overflow-hidden">
                 <div class="table-container">
-                    <table class="w-full table-auto divide-y divide-slate-200 responsive-table">
+                    <!-- MODIFICATION: Changed table-auto to table-fixed -->
+                    <table class="w-full table-fixed divide-y divide-slate-200 responsive-table">
                         <thead id="tableHeader" class="bg-slate-100"></thead>
                         <tbody id="productTableBody" class="bg-white divide-y divide-slate-200"></tbody>
                     </table>
@@ -171,7 +172,7 @@
 
     <!-- Details Modal -->
     <div id="productModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
-        <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform scale-95">
+        <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto transform scale-95">
             <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center z-10">
                 <h3 id="modalTitle" class="text-lg font-bold text-slate-800">产品详情</h3>
                 <button id="closeModalButton" class="text-gray-400 hover:text-gray-600">
@@ -184,11 +185,11 @@
 
     <!-- Image Modal -->
     <div id="imageModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
-        <div class="relative bg-white rounded-lg shadow-xl max-w-4xl max-h-[90vh]">
+        <div class="relative bg-white rounded-lg shadow-xl max-w-4xl max-h-[80vh]">
             <button id="closeImageModalButton" class="absolute -top-3 -right-3 text-white bg-gray-800 rounded-full p-1 hover:bg-gray-600 z-20">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
-            <img id="modalImage" src="" alt="产品图片" class="object-contain max-w-full max-h-[90vh] rounded-lg">
+            <img id="modalImage" src="" alt="产品图片" class="object-contain max-w-full max-h-[80vh] rounded-lg">
         </div>
     </div>
 
