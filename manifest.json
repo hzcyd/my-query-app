@@ -1,0 +1,21 @@
+{
+  "name": "智能查询助手",
+  "short_name": "AIBQ助手",
+  "description": "一个通过自然语言查询 BigQuery 的工具。",
+  "icons": [
+    {
+      "src": "/images/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/images/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#1a73e8"
+}
