@@ -4,7 +4,7 @@
     <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>产品数据库智能查询 (Gemini版)</title>
+    <title>产品数据库智能查询 (响应式版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +12,7 @@
     <style>
         body { 
             font-family: 'Inter', 'Noto Sans SC', sans-serif; 
-            background-color: #f8fafc; 
+            background-color: #f8fafc; /* bg-slate-50 */
         }
         .table-container { 
             max-height: 65vh; 
@@ -35,7 +35,7 @@
         thead th { 
             position: sticky; 
             top: 0; 
-            background-color: #f1f5f9; 
+            background-color: #f1f5f9; /* bg-slate-100 */
             z-index: 10; 
         }
         .loader { 
@@ -56,6 +56,68 @@
         .modal-content { 
             transition: transform 0.25s ease; 
         }
+
+        /* --- 移动端表格样式 --- */
+        @media (max-width: 767px) {
+            /* 在移动端，让table-container不再限制高度，以显示所有卡片 */
+            .table-container {
+                max-height: none;
+                overflow-y: visible;
+            }
+            /* 隐藏PC端的表头 */
+            .responsive-table thead {
+                display: none;
+            }
+            /* 将表格行、单元格转为块级元素，实现卡片效果 */
+            .responsive-table tbody,
+            .responsive-table tr,
+            .responsive-table td {
+                display: block;
+                width: 100%;
+            }
+            .responsive-table tr {
+                margin-bottom: 1rem;
+                border: 1px solid #e2e8f0; /* slate-200 */
+                border-radius: 0.75rem; /* rounded-lg */
+                overflow: hidden;
+                box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            }
+            /* 关键：使用 data-label 作为伪元素内容，显示标题 */
+            .responsive-table td {
+                display: flex;
+                justify-content: space-between; /* 标题和内容分居两侧 */
+                align-items: center;
+                padding: 0.75rem 1rem;
+                text-align: right; /* 内容靠右 */
+                border-bottom: 1px solid #f1f5f9; /* slate-100 */
+            }
+            .responsive-table tr:last-child {
+                 margin-bottom: 0;
+            }
+            .responsive-table td:last-child {
+                border-bottom: none;
+            }
+            .responsive-table td::before {
+                content: attr(data-label);
+                font-weight: 600; /* semibold */
+                text-align: left;
+                margin-right: 1rem;
+                color: #475569; /* slate-600 */
+                flex-shrink: 0;
+            }
+            /* 操作按钮的单元格样式调整 */
+            .responsive-table td.action-cell {
+                justify-content: center;
+                padding: 1rem;
+                background-color: #f8fafc;
+            }
+            .responsive-table td.action-cell::before {
+                display: none; /* 操作按钮不需要标题 */
+            }
+            .responsive-table .truncate {
+                white-space: normal; /* 在卡片视图中，允许长文本换行 */
+            }
+        }
     </style>
 </head>
 <body class="antialiased text-slate-700">
@@ -73,12 +135,12 @@
                         class="block w-full pl-4 pr-28 py-3 border border-slate-300 rounded-xl leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-sky-500 focus:border-sky-500 sm:text-sm shadow-sm transition duration-150 ease-in-out">
                     <button id="searchButton" class="absolute inset-y-0 right-0 flex items-center px-4 font-semibold text-white bg-sky-500 hover:bg-sky-600 rounded-r-xl">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
-                        <span class="ml-2">查询</span>
+                        <span class="ml-2 hidden sm:inline">查询</span>
                     </button>
                 </div>
             </div>
             
-            <div class="flex justify-center items-center mb-4 h-9 space-x-4">
+             <div class="flex flex-col sm:flex-row justify-center items-center mb-4 min-h-9 space-y-2 sm:space-y-0 sm:space-x-4">
                 <div id="stats" class="text-sm text-slate-600"></div>
                 <button id="exportButton" class="hidden items-center px-3 py-1.5 text-sm font-semibold text-white bg-green-500 hover:bg-green-600 rounded-lg shadow-sm disabled:bg-slate-300 disabled:cursor-not-allowed">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -90,7 +152,7 @@
 
             <div class="bg-white rounded-xl shadow-md overflow-hidden">
                 <div class="table-container">
-                    <table class="w-full table-fixed divide-y divide-slate-200">
+                    <table class="w-full table-auto divide-y divide-slate-200 responsive-table">
                         <thead id="tableHeader" class="bg-slate-100"></thead>
                         <tbody id="productTableBody" class="bg-white divide-y divide-slate-200"></tbody>
                     </table>
@@ -120,7 +182,7 @@
         </div>
     </div>
 
-    <!-- NEW: Image Modal -->
+    <!-- Image Modal -->
     <div id="imageModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
         <div class="relative bg-white rounded-lg shadow-xl max-w-4xl max-h-[90vh]">
             <button id="closeImageModalButton" class="absolute -top-3 -right-3 text-white bg-gray-800 rounded-full p-1 hover:bg-gray-600 z-20">
@@ -152,7 +214,7 @@
         const modalBody = document.getElementById('modalBody');
         const closeModalButton = document.getElementById('closeModalButton');
 
-        // NEW: Image Modal elements
+        // Image Modal elements
         const imageModal = document.getElementById('imageModal');
         const modalImage = document.getElementById('modalImage');
         const closeImageModalButton = document.getElementById('closeImageModalButton');
@@ -205,13 +267,13 @@
                 
                 visibleColumns.forEach(colName => {
                     const td = document.createElement('td');
+                    td.setAttribute('data-label', colName); 
                     td.className = 'px-4 py-4 text-sm text-slate-600 break-words'; 
                     const cellValue = (product[colName] === null || product[colName] === undefined) ? '' : product[colName];
                     
                     if (colName === '产品型号') {
                         const imageUrl = product['产品缩略图URL']; 
                         if (imageUrl) {
-                            // CHANGED: This is now a button-like link that triggers the modal
                             td.innerHTML = `<a href="#" data-image-url="${imageUrl}" class="view-image-btn text-sky-600 hover:text-sky-800 hover:underline">${cellValue}</a>`;
                         } else {
                             td.textContent = cellValue;
@@ -231,8 +293,10 @@
                 });
 
                 const actionTd = document.createElement('td');
-                actionTd.className = 'px-4 py-4 whitespace-nowrap text-sm text-center';
-                actionTd.innerHTML = `<button data-index="${index}" class="view-details-btn text-sky-600 hover:text-sky-800 font-semibold">查看详情</button>`;
+                actionTd.setAttribute('data-label', '操作');
+                actionTd.classList.add('action-cell');
+                actionTd.className += ' px-4 py-4 whitespace-nowrap text-sm text-center';
+                actionTd.innerHTML = `<button data-index="${index}" class="view-details-btn text-sky-600 hover:text-sky-800 font-semibold py-2 px-4 rounded-md w-full bg-white border border-slate-300 hover:bg-slate-50">查看详情</button>`;
                 row.appendChild(actionTd);
                 tableBody.appendChild(row);
             });
@@ -251,7 +315,6 @@
                 '核心参数', '核心参数2', '成本价', '代发价', '京东零售价', '利润', 
                 '库存', '在途库存'
             ];
-            // FIX: Corrected '3c图片' to '3C图片' to match data
             const lastOrder = ['3C图片', '质检图片', '图片资料包'];
             
             const urlKey = '产品缩略图URL';
@@ -297,7 +360,7 @@
             productModal.querySelector('.modal-content').classList.add('scale-95');
         }
 
-        // --- NEW: Image Modal Functions ---
+        // --- Image Modal Functions ---
         function showImageModal(imageUrl) {
             modalImage.src = imageUrl;
             imageModal.classList.remove('opacity-0', 'pointer-events-none');
@@ -395,7 +458,7 @@
         closeModalButton.addEventListener('click', hideProductDetails);
         productModal.addEventListener('click', (event) => { if (event.target === productModal) hideProductDetails(); });
 
-        // NEW: Image Modal Listeners
+        // Image Modal Listeners
         closeImageModalButton.addEventListener('click', hideImageModal);
         imageModal.addEventListener('click', (event) => { if (event.target === imageModal) hideImageModal(); });
 
