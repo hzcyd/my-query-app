@@ -68,13 +68,13 @@
     <!-- 主应用容器 -->
     <div id="appContainer" class="hidden">
         <div class="container mx-auto p-4 sm:p-6 lg:p-8">
-            <!-- 【修改】优化移动端Header布局 -->
             <header class="mb-8 flex justify-between items-center sm:block sm:text-center sm:relative">
                 <div class="text-left sm:text-center">
-                    <h1 class="text-2xl sm:text-4xl font-bold text-slate-800">产品数据库智能查询</h1>
-                    <p class="mt-1 sm:mt-2 text-slate-500 text-sm sm:text-base">向Gemini提问，它会帮您从数据库中筛选数据！</p>
+                    <h1 class="text-2xl sm:text-4xl font-bold text-slate-800">数据库智能查询</h1>
+                    <p class="mt-1 sm:mt-2 text-slate-500 text-sm sm:text-base">向AI提问，它会帮您从数据库中筛选数据！</p>
                 </div>
-                <button id="logoutButton" class="flex-shrink-0 text-sm text-slate-500 hover:text-sky-600 font-semibold py-2 px-3 rounded-md hover:bg-slate-100 transition-colors sm:absolute sm:top-0 sm:right-0">
+                <!-- 【修改】为登出按钮添加蓝色边框和样式 -->
+                <button id="logoutButton" class="flex-shrink-0 text-sm text-sky-600 font-semibold py-2 px-3 rounded-md transition-colors border border-sky-500 hover:bg-sky-50 sm:absolute sm:top-0 sm:right-0">
                     登出
                 </button>
             </header>
@@ -89,7 +89,6 @@
                     </button>
                 </div>
             </div>
-            <!-- 【修改】优化导出按钮布局和大小 -->
             <div class="flex justify-between items-center mb-4 min-h-9">
                 <div id="stats" class="text-sm text-slate-600"></div>
                 <button id="exportButton" class="hidden items-center px-2.5 py-1 text-xs font-semibold text-white bg-green-500 hover:bg-green-600 rounded-md shadow-sm disabled:bg-slate-300 disabled:cursor-not-allowed">
