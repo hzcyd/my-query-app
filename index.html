@@ -39,36 +39,62 @@
 </head>
 <body class="antialiased text-slate-700">
 
-    <div id="appContainer">
+    <!-- 登录模态框 -->
+    <div id="loginModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8">
+            <h2 class="text-2xl font-bold text-center text-slate-800 mb-2">欢迎回来</h2>
+            <p class="text-center text-slate-500 mb-6">请输入您的凭证以继续</p>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-medium text-slate-700 mb-1">账号</label>
+                    <input type="text" id="username" name="username" required
+                           class="block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm">
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-slate-700 mb-1">密码</label>
+                    <input type="password" id="password" name="password" required
+                           class="block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm">
+                </div>
+                <button type="submit" id="loginButton"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 disabled:bg-slate-400">
+                    <span id="loginButtonText">登录</span>
+                    <div id="loginLoader" class="loader !w-5 !h-5 !border-2 !border-t-white hidden ml-2"></div>
+                </button>
+                <p id="loginError" class="text-red-500 text-sm mt-4 text-center h-5"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- 主应用容器 -->
+    <div id="appContainer" class="hidden">
         <div class="container mx-auto p-4 sm:p-6 lg:p-8">
-            <header class="text-center mb-8">
+            <header class="text-center mb-8 relative">
                 <h1 class="text-3xl sm:text-4xl font-bold text-slate-800">产品数据库智能查询</h1>
                 <p class="mt-2 text-slate-500">向Gemini提问，它会帮您从数据库中筛选数据！</p>
+                <button id="logoutButton" class="absolute top-0 right-0 text-sm text-slate-500 hover:text-sky-600 font-semibold py-2 px-4 rounded-md hover:bg-slate-100 transition-colors">
+                    登出
+                </button>
             </header>
-
-            <!-- 搜索框和按钮的HTML结构保持不变 -->
+            
             <div class="mb-6 max-w-2xl mx-auto">
                 <div class="relative">
-                    <input type="text" id="searchInput"
+                    <input type="text" id="searchInput" placeholder="例如: 美的最便宜的是哪个"
                            class="block w-full pl-4 pr-28 py-3 border border-slate-300 rounded-xl leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-sky-500 focus:border-sky-500 sm:text-sm shadow-sm transition duration-150 ease-in-out">
-                    <button id="searchButton" class="absolute inset-y-0 right-0 flex items-center px-4 font-semibold text-white bg-sky-500 hover:bg-sky-600 rounded-r-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">
+                    <button id="searchButton" class="absolute inset-y-0 right-0 flex items-center px-4 font-semibold text-white bg-sky-500 hover:bg-sky-600 rounded-r-xl">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
                         <span class="ml-2 hidden sm:inline">查询</span>
                     </button>
                 </div>
             </div>
-            
             <div class="flex flex-col sm:flex-row justify-center items-center mb-4 min-h-9 space-y-2 sm:space-y-0 sm:space-x-4">
                 <div id="stats" class="text-sm text-slate-600"></div>
-                <button id="exportButton" class="hidden items-center px-3 py-1.5 text-sm font-semibold text-white bg-green-500 hover:bg-green-600 rounded-lg shadow-sm disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors">
+                <button id="exportButton" class="hidden items-center px-3 py-1.5 text-sm font-semibold text-white bg-green-500 hover:bg-green-600 rounded-lg shadow-sm disabled:bg-slate-300 disabled:cursor-not-allowed">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
                     <span id="exportButtonText">导出CSV</span>
                 </button>
             </div>
-
-            <!-- 表格和消息中心的HTML结构保持不变 -->
             <div class="bg-white rounded-xl shadow-md overflow-hidden">
                 <div class="table-container">
                     <table class="w-full table-fixed divide-y divide-slate-200 responsive-table">
@@ -88,7 +114,7 @@
         </div>
     </div>
 
-    <!-- 详情模态框的HTML结构保持不变 -->
+    <!-- Details Modal -->
     <div id="productModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
         <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[60vh] overflow-y-auto transform scale-95">
             <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center z-10">
@@ -101,7 +127,7 @@
         </div>
     </div>
 
-    <!-- 图片模态框的HTML结构保持不变 -->
+    <!-- Image Modal -->
     <div id="imageModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
         <div class="relative bg-white rounded-lg shadow-xl max-w-4xl max-h-[80vh]">
             <button id="closeImageModalButton" class="absolute -top-3 -right-3 text-white bg-gray-800 rounded-full p-1 hover:bg-gray-600 z-20">
@@ -111,16 +137,34 @@
         </div>
     </div>
 
-
     <script>
+        // --- API 端点配置 ---
         const BASE_API_URL = "https://product-search-api-bigquery-831320827787.us-central1.run.app"; // 请务必替换为您的实际URL
+        const LOGIN_API_ENDPOINT = `${BASE_API_URL}/login`;
         const SEARCH_API_ENDPOINT = `${BASE_API_URL}/search`;
         const DETAILS_API_ENDPOINT = `${BASE_API_URL}/details`;
 
+        // 【新增】数据库列顺序常量
+        const DB_COLUMN_ORDER = [
+            '序号', '品牌', '所属事业部', '大类', '小类', '产品名称', '产品型号', 
+            '渠道属性', '条形码', '核心参数', '产品卖点', '产品颜色', '容量', 
+            '尺寸', '体积', '重量', '箱规', '功率', '能效等级', '库存', '成本价', 
+            '代发价', '京东零售价', '评论数', '京东链接', '是否自营', '发货仓库', 
+            '是否退市', '3C图片', '质检图片', '产品缩略图URL', '图片资料包'
+        ];
+
+        // --- DOM 元素获取 ---
+        const loginModal = document.getElementById('loginModal');
+        const appContainer = document.getElementById('appContainer');
+        const loginForm = document.getElementById('loginForm');
+        const loginButton = document.getElementById('loginButton');
+        const loginButtonText = document.getElementById('loginButtonText');
+        const loginLoader = document.getElementById('loginLoader');
+        const loginError = document.getElementById('loginError');
+        const logoutButton = document.getElementById('logoutButton');
         const tableHeader = document.getElementById('tableHeader');
         const tableBody = document.getElementById('productTableBody');
         const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
         const statsDiv = document.getElementById('stats');
         const messageCenter = document.getElementById('messageCenter');
         const loader = document.getElementById('loader');
@@ -136,8 +180,172 @@
         const modalImage = document.getElementById('modalImage');
         const closeImageModalButton = document.getElementById('closeImageModalButton');
         
+        // --- 全局状态变量 ---
         let currentProducts = [];
 
+        // --- 认证核心函数 ---
+        function handleLogin(event) {
+            event.preventDefault();
+            loginError.textContent = '';
+            loginButton.disabled = true;
+            loginButtonText.classList.add('hidden');
+            loginLoader.classList.remove('hidden');
+
+            const username = loginForm.username.value;
+            const password = loginForm.password.value;
+
+            fetch(LOGIN_API_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error || '登录失败') });
+                }
+                return response.json();
+            })
+            .then(data => {
+                sessionStorage.setItem('authToken', data.token);
+                showApp();
+            })
+            .catch(error => {
+                loginError.textContent = error.message;
+            })
+            .finally(() => {
+                loginButton.disabled = false;
+                loginButtonText.classList.remove('hidden');
+                loginLoader.classList.add('hidden');
+            });
+        }
+
+        function handleLogout() {
+            sessionStorage.removeItem('authToken');
+            location.reload();
+        }
+        
+        function showApp() {
+            loginModal.classList.add('hidden');
+            appContainer.classList.remove('hidden');
+        }
+
+        function showLogin() {
+            appContainer.classList.add('hidden');
+            loginModal.classList.remove('hidden');
+        }
+
+        // --- 封装带认证的 fetch 请求 ---
+        async function fetchWithAuth(url, options = {}) {
+            const token = sessionStorage.getItem('authToken');
+            if (!token) {
+                showLogin();
+                throw new Error("认证失效，请重新登录。");
+            }
+            const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, ...options.headers };
+            const response = await fetch(url, { ...options, headers });
+            if (response.status === 401) {
+                showLogin();
+                throw new Error("认证已过期，请重新登录。");
+            }
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `服务器错误: ${response.status}`);
+            }
+            return response.json();
+        }
+
+        // --- 核心业务函数 ---
+        async function performSearch() {
+            const searchTerm = searchInput.value.trim();
+            if (!searchTerm) {
+                statsDiv.textContent = '请输入查询内容！';
+                statsDiv.classList.add('text-red-500');
+                setTimeout(() => { statsDiv.textContent = ''; statsDiv.classList.remove('text-red-500'); }, 3000);
+                return;
+            }
+            tableHeader.innerHTML = '';
+            tableBody.innerHTML = '';
+            statsDiv.textContent = '';
+            exportButton.classList.add('hidden');
+            messageCenter.classList.remove('hidden');
+            loader.classList.remove('hidden');
+            messageTitle.textContent = '正在查询，请稍候...';
+            messageText.textContent = 'Gemini正在为您生成SQL并查询数据库。';
+
+            try {
+                const data = await fetchWithAuth(SEARCH_API_ENDPOINT, {
+                    method: 'POST',
+                    body: JSON.stringify({ query: searchTerm }),
+                });
+                renderTable(data.products, data.display_columns);
+            } catch (error) {
+                loader.classList.add('hidden');
+                messageTitle.textContent = '查询失败';
+                messageText.textContent = error.message;
+            }
+        }
+
+        async function fetchAndShowDetails(productId) {
+            modalBody.innerHTML = '<div class="loader mx-auto"></div>';
+            showProductDetails({ '品牌': '正在加载...' }); 
+
+            try {
+                const productDetails = await fetchWithAuth(`${DETAILS_API_ENDPOINT}?id=${productId}`);
+                showProductDetails(productDetails);
+            } catch (error) {
+                modalBody.innerHTML = `<p class="text-red-500 text-center p-4">加载详情失败: ${error.message}</p>`;
+            }
+        }
+        
+        async function exportToCSV() {
+            if (currentProducts.length === 0) { return; }
+            exportButton.disabled = true;
+            exportButtonText.textContent = `准备数据 (0/${currentProducts.length})...`;
+            try {
+                let count = 0;
+                const fetchPromises = currentProducts.map(product =>
+                    fetchWithAuth(`${DETAILS_API_ENDPOINT}?id=${product['序号']}`)
+                        .then(data => {
+                            count++;
+                            exportButtonText.textContent = `准备数据 (${count}/${currentProducts.length})...`;
+                            return data;
+                        })
+                        .catch(err => { console.error(`Failed to fetch details for ID ${product['序号']}:`, err); return null; })
+                );
+                const detailedProducts = (await Promise.all(fetchPromises)).filter(p => p !== null);
+
+                if (detailedProducts.length === 0) {
+                    throw new Error("未能获取任何产品的详细数据以供导出。");
+                }
+
+                const headers = Object.keys(detailedProducts[0]);
+                const csvRows = [headers.join(',')];
+                detailedProducts.forEach(product => {
+                    const row = headers.map(header => escapeCSVCell(product[header]));
+                    csvRows.push(row.join(','));
+                });
+
+                const csvString = '\uFEFF' + csvRows.join('\n');
+                const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+                link.setAttribute('download', `产品查询结果-${timestamp}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+            } catch (error) {
+                alert(`导出失败: ${error.message}`);
+            } finally {
+                exportButton.disabled = false;
+                exportButtonText.textContent = '导出CSV';
+            }
+        }
+        
+        // --- 渲染与显示函数 ---
         function renderTable(products, displayColumns) {
             currentProducts = products;
             tableHeader.innerHTML = '';
@@ -149,7 +357,6 @@
                 messageTitle.textContent = '未能找到结果';
                 messageText.textContent = '请尝试使用其他关键词进行搜索。';
                 exportButton.classList.add('hidden');
-                statsDiv.textContent = '';
                 return;
             }
             
@@ -163,43 +370,35 @@
                 th.textContent = colName;
                 headerRow.appendChild(th);
             });
-            
             const actionTh = document.createElement('th');
             actionTh.className = 'px-4 py-3 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider';
             actionTh.textContent = '操作';
             headerRow.appendChild(actionTh);
             tableHeader.appendChild(headerRow);
 
-            products.forEach(product => {
+            products.forEach((product) => {
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-slate-50 transition duration-150 ease-in-out';
                 
                 displayColumns.forEach(colName => {
                     const td = document.createElement('td');
-                    td.setAttribute('data-label', colName); 
-                    td.className = 'px-4 py-4 text-sm text-slate-600 break-words'; 
+                    td.setAttribute('data-label', colName);
+                    td.className = 'px-4 py-4 text-sm text-slate-600 break-words';
                     const cellValue = (product[colName] === null || product[colName] === undefined) ? '' : product[colName];
                     
-                    // --- 【核心修改】: 添加特殊逻辑来渲染可点击的产品型号 ---
-                    if (colName === '产品型号') {
-                        const imageUrl = product['产品缩略图URL'];
-                        if (imageUrl) {
-                            // 如果有URL，则创建链接
-                            td.innerHTML = `<a href="#" data-image-url="${imageUrl}" class="view-image-btn text-sky-600 hover:text-sky-800 hover:underline">${cellValue}</a>`;
-                        } else {
-                            // 如果没有URL，则只显示文本
-                            td.textContent = cellValue;
-                        }
+                    if (colName === '产品型号' && product['产品缩略图URL']) {
+                        td.innerHTML = `<a href="#" data-image-url="${product['产品缩略图URL']}" class="view-image-btn text-sky-600 hover:text-sky-800 hover:underline">${cellValue}</a>`;
                     } else {
-                        // 其他列的渲染逻辑保持不变
                         let displayValue = cellValue;
                         if (['成本价', '代发价', '京东零售价'].includes(colName) && cellValue) {
                            displayValue = `¥${cellValue}`;
                         }
                         td.textContent = displayValue;
-                        td.title = displayValue; // 为长文本提供悬浮提示
+                        td.title = displayValue; // Use `title` for tooltip on hover
+                        if (['产品名称', '核心参数'].includes(colName)) {
+                            td.classList.add('truncate');
+                        }
                     }
-                    
                     row.appendChild(td);
                 });
 
@@ -207,41 +406,33 @@
                 actionTd.setAttribute('data-label', '操作');
                 actionTd.classList.add('action-cell');
                 actionTd.className += ' px-4 py-4 whitespace-nowrap text-sm text-center';
-                
-                const productId = product['序号'];
-                actionTd.innerHTML = `<button data-id="${productId}" class="view-details-btn text-sky-600 hover:text-sky-800 font-semibold py-2 px-4 rounded-md w-full bg-white border border-slate-300 hover:bg-slate-50 transition-colors">查看详情</button>`;
+                actionTd.innerHTML = `<button data-id="${product['序号']}" class="view-details-btn text-sky-600 hover:text-sky-800 font-semibold py-2 px-4 rounded-md w-full bg-white border border-slate-300 hover:bg-slate-50">查看详情</button>`;
                 row.appendChild(actionTd);
                 tableBody.appendChild(row);
             });
             statsDiv.textContent = `查询到 ${products.length} 条相关记录。`;
         }
         
+        // 【核心修改】重写此函数以保证顺序
         function showProductDetails(product) {
             modalTitle.textContent = `${product['品牌'] || ''} - ${product['产品型号'] || '产品详情'}`;
             let detailsHtml = '<dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">';
-
-            const allProductKeys = Object.keys(product);
-            const preferredOrder = [ '品牌', '产品型号', '产品名称', '所属事业部', '大类', '小类', '核心参数', '成本价', '代发价', '京东零售价', '库存' ];
-            const lastOrder = ['京东链接', '3C图片', '质检图片', '图片资料包'];
-            const excludedKeys = [...preferredOrder, ...lastOrder];
-            const middleOrder = allProductKeys.filter(key => !excludedKeys.includes(key)).sort();
-            const finalDisplayOrder = [...preferredOrder, ...middleOrder, ...lastOrder];
 
             const createDetailItem = (key, value) => {
                 if (value === null || value === undefined || value === '') return '';
                 const valueStr = String(value);
                 let valueHtml;
-                 if ((key.includes('图片') || key.includes('URL')) && (valueStr.startsWith('http'))) {
-                    valueHtml = `<a href="#" data-image-url="${valueStr}" class="view-image-btn text-sky-600 hover:text-sky-800 hover:underline break-all">${valueStr}</a>`;
-                } else if (valueStr.startsWith('http')) {
-                    valueHtml = `<a href="${valueStr}" target="_blank" rel="noopener noreferrer" class="text-sky-600 hover:text-sky-800 hover:underline break-all">${valueStr}</a>`;
+                if ((valueStr.startsWith('http://') || valueStr.startsWith('https://')) && !key.includes('URL')) {
+                     valueHtml = `<a href="${valueStr}" target="_blank" rel="noopener noreferrer" class="text-sky-600 hover:text-sky-800 hover:underline break-all">${valueStr}</a>`;
                 } else {
                     valueHtml = `<span class="break-all">${valueStr}</span>`;
                 }
                 return `<div class="bg-slate-50 p-3 rounded-lg"><dt class="text-sm font-medium text-gray-500">${key}</dt><dd class="mt-1 text-sm text-gray-900">${valueHtml}</dd></div>`;
             };
 
-            finalDisplayOrder.forEach(key => {
+            // 使用预定义的 DB_COLUMN_ORDER 数组进行遍历
+            DB_COLUMN_ORDER.forEach(key => {
+                // 检查产品数据中是否存在这个键，以避免显示空项
                 if (product.hasOwnProperty(key)) {
                     detailsHtml += createDetailItem(key, product[key]);
                 }
@@ -268,60 +459,6 @@
             modalImage.src = '';
         }
 
-        async function fetchAndShowDetails(productId) {
-            modalTitle.textContent = '正在加载详情...';
-            modalBody.innerHTML = '<div class="loader mx-auto my-8"></div>';
-            productModal.classList.remove('opacity-0', 'pointer-events-none');
-            productModal.querySelector('.modal-content').classList.remove('scale-95');
-
-            try {
-                const response = await fetch(`${DETAILS_API_ENDPOINT}?id=${productId}`);
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || `服务器错误: ${response.status}`);
-                }
-                const productDetails = await response.json();
-                showProductDetails(productDetails);
-            } catch (error) {
-                modalBody.innerHTML = `<p class="text-red-500 text-center p-4">加载详情失败: ${error.message}</p>`;
-            }
-        }
-
-        async function performSearch() {
-            const searchTerm = searchInput.value.trim();
-            if (!searchTerm) {
-                statsDiv.textContent = '请输入查询内容！';
-                return;
-            }
-
-            tableHeader.innerHTML = '';
-            tableBody.innerHTML = '';
-            statsDiv.textContent = '';
-            exportButton.classList.add('hidden');
-            messageCenter.classList.remove('hidden');
-            loader.classList.remove('hidden');
-            messageTitle.textContent = '正在查询，请稍候...';
-            messageText.textContent = 'Gemini正在为您生成SQL并查询数据库。';
-
-            try {
-                const response = await fetch(SEARCH_API_ENDPOINT, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query: searchTerm }),
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || `服务器错误: ${response.status}`);
-                }
-                const data = await response.json();
-                renderTable(data.products, data.display_columns);
-            } catch (error) {
-                loader.classList.add('hidden');
-                messageTitle.textContent = '查询失败';
-                messageText.textContent = error.message;
-            }
-        }
-        
         function escapeCSVCell(cell) {
             if (cell === null || cell === undefined) return '';
             const cellStr = String(cell);
@@ -331,65 +468,25 @@
             return cellStr;
         }
 
-        async function exportToCSV() {
-            if (currentProducts.length === 0) {
-                alert('没有可导出的数据。');
-                return;
-            }
-            
-            exportButton.disabled = true;
-            exportButtonText.textContent = '准备数据...';
-
-            try {
-                const fetchPromises = currentProducts.map(product =>
-                    fetch(`${DETAILS_API_ENDPOINT}?id=${product['序号']}`).then(res => res.ok ? res.json() : null)
-                );
-                const detailedProducts = (await Promise.all(fetchPromises)).filter(p => p !== null);
-
-                if (detailedProducts.length === 0) throw new Error("未能获取用于导出的详细数据。");
-                
-                const headers = Object.keys(detailedProducts[0]);
-                const csvRows = [headers.join(',')];
-                detailedProducts.forEach(product => {
-                    csvRows.push(headers.map(header => escapeCSVCell(product[header])).join(','));
-                });
-
-                const csvString = '\uFEFF' + csvRows.join('\n');
-                const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                
-                link.href = URL.createObjectURL(blob);
-                link.download = `产品查询结果-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.csv`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } catch (error) {
-                alert(`导出失败: ${error.message}`);
-            } finally {
-                exportButton.disabled = false;
-                exportButtonText.textContent = '导出CSV';
-            }
-        }
-
+        // --- 事件监听器设置 ---
+        loginForm.addEventListener('submit', handleLogin);
+        logoutButton.addEventListener('click', handleLogout);
         searchButton.addEventListener('click', performSearch);
         searchInput.addEventListener('keyup', (event) => { if (event.key === 'Enter') performSearch(); });
         exportButton.addEventListener('click', exportToCSV);
-
         closeModalButton.addEventListener('click', hideProductDetails);
         productModal.addEventListener('click', (event) => { if (event.target === productModal) hideProductDetails(); });
-
         closeImageModalButton.addEventListener('click', hideImageModal);
         imageModal.addEventListener('click', (event) => { if (event.target === imageModal) hideImageModal(); });
 
-        document.body.addEventListener('click', (event) => {
+        tableBody.addEventListener('click', (event) => {
             const detailsButton = event.target.closest('.view-details-btn');
             if (detailsButton) {
                 event.preventDefault();
-                const productId = detailsButton.dataset.id;
-                fetchAndShowDetails(productId);
+                const id = detailsButton.dataset.id;
+                fetchAndShowDetails(id);
                 return;
             }
-
             const imageButton = event.target.closest('.view-image-btn');
             if (imageButton) {
                 event.preventDefault();
@@ -399,7 +496,11 @@
         });
         
         document.addEventListener('DOMContentLoaded', () => {
-            searchInput.placeholder = "例如: 美的最便宜的是哪个";
+            if (sessionStorage.getItem('authToken')) {
+                showApp();
+            } else {
+                showLogin();
+            }
         });
     </script>
 </body>
