@@ -73,7 +73,6 @@
                     <h1 class="text-2xl sm:text-4xl font-bold text-slate-800">数据库智能查询</h1>
                     <p class="mt-1 sm:mt-2 text-slate-500 text-sm sm:text-base">向AI提问，它会帮您从数据库中筛选数据！</p>
                 </div>
-                <!-- 【修改】为登出按钮添加蓝色边框和样式 -->
                 <button id="logoutButton" class="flex-shrink-0 text-sm text-sky-600 font-semibold py-2 px-3 rounded-md transition-colors border border-sky-500 hover:bg-sky-50 sm:absolute sm:top-0 sm:right-0">
                     登出
                 </button>
@@ -81,7 +80,7 @@
             
             <div class="mb-6 max-w-2xl mx-auto">
                 <div class="relative">
-                    <input type="text" id="searchInput" placeholder="例如: 最便宜的美的电饭煲"
+                    <input type="text" id="searchInput" placeholder="例如: 美的电饭煲，代发价100-200"
                            class="block w-full pl-4 pr-28 py-3 border border-slate-300 rounded-xl leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-sky-500 focus:border-sky-500 sm:text-sm shadow-sm transition duration-150 ease-in-out">
                     <button id="searchButton" class="absolute inset-y-0 right-0 flex items-center px-4 font-semibold text-white bg-sky-500 hover:bg-sky-600 rounded-r-xl">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
@@ -89,15 +88,25 @@
                     </button>
                 </div>
             </div>
+            
             <div class="flex justify-between items-center mb-4 min-h-9">
                 <div id="stats" class="text-sm text-slate-600"></div>
-                <button id="exportButton" class="hidden items-center px-2.5 py-1 text-xs font-semibold text-white bg-green-500 hover:bg-green-600 rounded-md shadow-sm disabled:bg-slate-300 disabled:cursor-not-allowed">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    <span id="exportButtonText">导出CSV</span>
-                </button>
+                <div class="flex items-center space-x-2">
+                    <button id="sortButton" class="hidden items-center px-2.5 py-1 text-xs font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 rounded-md shadow-sm">
+                        <svg id="sortIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9M3 12h9m-9 4h13m0-4l3 3m0 0l3-3m-3 3v-8" />
+                        </svg>
+                        <span id="sortButtonText">按价格排序</span>
+                    </button>
+                    <button id="exportButton" class="hidden items-center px-2.5 py-1 text-xs font-semibold text-white bg-green-500 hover:bg-green-600 rounded-md shadow-sm disabled:bg-slate-300 disabled:cursor-not-allowed">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        <span id="exportButtonText">导出CSV</span>
+                    </button>
+                </div>
             </div>
+
             <div class="bg-white rounded-xl shadow-md overflow-hidden">
                 <div class="table-container">
                     <table class="w-full table-fixed divide-y divide-slate-200 responsive-table">
@@ -167,6 +176,7 @@
         const logoutButton = document.getElementById('logoutButton');
         const tableHeader = document.getElementById('tableHeader');
         const tableBody = document.getElementById('productTableBody');
+        const searchButton = document.getElementById('searchButton');
         const searchInput = document.getElementById('searchInput');
         const statsDiv = document.getElementById('stats');
         const messageCenter = document.getElementById('messageCenter');
@@ -182,9 +192,14 @@
         const imageModal = document.getElementById('imageModal');
         const modalImage = document.getElementById('modalImage');
         const closeImageModalButton = document.getElementById('closeImageModalButton');
+        const sortButton = document.getElementById('sortButton');
+        const sortButtonText = document.getElementById('sortButtonText');
+        const sortIcon = document.getElementById('sortIcon');
         
         // --- 全局状态变量 ---
-        let currentProducts = [];
+        let originalProducts = []; 
+        let currentDisplayProducts = [];
+        let sortState = 'default';
 
         // --- 认证核心函数 ---
         function handleLogin(event) {
@@ -208,9 +223,19 @@
                 }
                 return response.json();
             })
+            // 【修改】对登录成功后的逻辑增加错误处理
             .then(data => {
-                sessionStorage.setItem('authToken', data.token);
-                showApp();
+                try {
+                    if (!data.token) {
+                        throw new Error("服务器未返回有效的认证令牌。");
+                    }
+                    sessionStorage.setItem('authToken', data.token);
+                    showApp();
+                } catch (e) {
+                    // 这个catch块可以捕获sessionStorage的错误（例如在无痕模式下）
+                    console.error("在处理登录成功逻辑时出错:", e);
+                    loginError.textContent = `客户端错误: ${e.message}`;
+                }
             })
             .catch(error => {
                 loginError.textContent = error.message;
@@ -247,7 +272,7 @@
             const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, ...options.headers };
             const response = await fetch(url, { ...options, headers });
             if (response.status === 401) {
-                showLogin();
+                handleLogout(); // 改为调用登出函数，体验更好
                 throw new Error("认证已过期，请重新登录。");
             }
             if (!response.ok) {
@@ -270,6 +295,7 @@
             tableBody.innerHTML = '';
             statsDiv.textContent = '';
             exportButton.classList.add('hidden');
+            sortButton.classList.add('hidden');
             messageCenter.classList.remove('hidden');
             loader.classList.remove('hidden');
             messageTitle.textContent = '正在查询，请稍候...';
@@ -280,20 +306,26 @@
                     method: 'POST',
                     body: JSON.stringify({ query: searchTerm }),
                 });
-                renderTable(data.products, data.display_columns);
+                originalProducts = data.products; 
+                currentDisplayProducts = [...originalProducts]; 
+                sortState = 'default'; 
+                updateSortButtonUI(); 
+                renderTable(currentDisplayProducts, data.display_columns);
             } catch (error) {
                 loader.classList.add('hidden');
                 messageTitle.textContent = '查询失败';
                 messageText.textContent = error.message;
             }
         }
-
+        
         async function fetchAndShowDetails(productId) {
-            modalBody.innerHTML = '<div class="loader mx-auto"></div>';
-            showProductDetails({ '品牌': '正在加载...' }); 
+            modalBody.innerHTML = '<div class="flex justify-center items-center p-8"><div class="loader"></div></div>';
+            // 预先打开模态框并显示标题
+            showProductDetails({ '品牌': '正在加载', '产品型号': '详情...' }); 
 
             try {
                 const productDetails = await fetchWithAuth(`${DETAILS_API_ENDPOINT}?id=${productId}`);
+                // 拿到数据后再用完整信息更新一次模态框
                 showProductDetails(productDetails);
             } catch (error) {
                 modalBody.innerHTML = `<p class="text-red-500 text-center p-4">加载详情失败: ${error.message}</p>`;
@@ -301,16 +333,16 @@
         }
         
         async function exportToCSV() {
-            if (currentProducts.length === 0) { return; }
+            if (currentDisplayProducts.length === 0) { return; }
             exportButton.disabled = true;
-            exportButtonText.textContent = `准备数据 (0/${currentProducts.length})...`;
+            exportButtonText.textContent = `准备数据 (0/${currentDisplayProducts.length})...`;
             try {
                 let count = 0;
-                const fetchPromises = currentProducts.map(product =>
+                const fetchPromises = currentDisplayProducts.map(product =>
                     fetchWithAuth(`${DETAILS_API_ENDPOINT}?id=${product['序号']}`)
                         .then(data => {
                             count++;
-                            exportButtonText.textContent = `准备数据 (${count}/${currentProducts.length})...`;
+                            exportButtonText.textContent = `准备数据 (${count}/${currentDisplayProducts.length})...`;
                             return data;
                         })
                         .catch(err => { console.error(`Failed to fetch details for ID ${product['序号']}:`, err); return null; })
@@ -320,9 +352,11 @@
                 if (detailedProducts.length === 0) {
                     throw new Error("未能获取任何产品的详细数据以供导出。");
                 }
-
-                const headers = Object.keys(detailedProducts[0]);
+                
+                // 使用DB_COLUMN_ORDER来保证CSV列的顺序
+                const headers = DB_COLUMN_ORDER.filter(h => detailedProducts[0].hasOwnProperty(h));
                 const csvRows = [headers.join(',')];
+
                 detailedProducts.forEach(product => {
                     const row = headers.map(header => escapeCSVCell(product[header]));
                     csvRows.push(row.join(','));
@@ -348,9 +382,48 @@
             }
         }
         
+        function handleSort() {
+            if (originalProducts.length === 0) return;
+
+            if (sortState === 'default') {
+                sortState = 'asc';
+            } else if (sortState === 'asc') {
+                sortState = 'desc';
+            } else {
+                sortState = 'default';
+            }
+            
+            if (sortState === 'default') {
+                currentDisplayProducts = [...originalProducts];
+            } else {
+                currentDisplayProducts.sort((a, b) => {
+                    const priceA = parseFloat(a['代发价']) || 0;
+                    const priceB = parseFloat(b['代发价']) || 0;
+                    return sortState === 'asc' ? priceA - priceB : priceB - priceA;
+                });
+            }
+
+            updateSortButtonUI();
+            const displayColumns = ['序号', '品牌', '产品型号', '产品名称', '核心参数', '成本价', '代发价', '库存'];
+            renderTable(currentDisplayProducts, displayColumns);
+        }
+
+        function updateSortButtonUI() {
+            if (sortState === 'asc') {
+                sortButtonText.textContent = '价格升序';
+                sortIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />`;
+            } else if (sortState === 'desc') {
+                sortButtonText.textContent = '价格降序';
+                sortIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4 4m0 0l4-4m-4 4V4" />`;
+            } else {
+                sortButtonText.textContent = '按价格排序';
+                sortIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9M3 12h9m-9 4h13m0-4l3 3m0 0l3-3m-3 3v-8" />`;
+            }
+        }
+        
         // --- 渲染与显示函数 ---
         function renderTable(products, displayColumns) {
-            currentProducts = products;
+            currentDisplayProducts = products;
             tableHeader.innerHTML = '';
             tableBody.innerHTML = '';
 
@@ -360,11 +433,13 @@
                 messageTitle.textContent = '未能找到结果';
                 messageText.textContent = '请尝试使用其他关键词进行搜索。';
                 exportButton.classList.add('hidden');
+                sortButton.classList.add('hidden');
                 return;
             }
             
             messageCenter.classList.add('hidden');
             exportButton.classList.remove('hidden');
+            sortButton.classList.remove('hidden'); 
 
             const headerRow = document.createElement('tr');
             displayColumns.forEach(colName => {
@@ -397,7 +472,7 @@
                            displayValue = `¥${cellValue}`;
                         }
                         td.textContent = displayValue;
-                        td.title = displayValue; // Use `title` for tooltip on hover
+                        td.title = displayValue; 
                         if (['产品名称', '核心参数'].includes(colName)) {
                             td.classList.add('truncate');
                         }
@@ -478,6 +553,7 @@
         productModal.addEventListener('click', (event) => { if (event.target === productModal) hideProductDetails(); });
         closeImageModalButton.addEventListener('click', hideImageModal);
         imageModal.addEventListener('click', (event) => { if (event.target === imageModal) hideImageModal(); });
+        sortButton.addEventListener('click', handleSort);
 
         tableBody.addEventListener('click', (event) => {
             const detailsButton = event.target.closest('.view-details-btn');
