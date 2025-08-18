@@ -1,6 +1,6 @@
 {
-  "name": "智能查询助手",
-  "short_name": "AIBQ助手",
+  "name": "浙江太合产品库查询",
+  "short_name": "太合产品库",
   "description": "一个通过自然语言查询 BigQuery 的工具。",
   "icons": [
     {
