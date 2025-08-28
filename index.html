@@ -9,48 +9,126 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        /* 您的所有样式都非常棒，无需修改，予以保留 */
-        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; background-color: #f8fafc; }
-        .table-container { max-height: 65vh; overflow-y: auto; }
-        .table-container::-webkit-scrollbar { width: 8px; height: 8px; }
-        .table-container::-webkit-scrollbar-track { background: #f1f1f1; }
-        .table-container::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
-        .table-container::-webkit-scrollbar-thumb:hover { background: #555; }
-        thead th { position: sticky; top: 0; background-color: #f1f5f9; z-index: 10; }
-        .loader { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #3498db; width: 40px; height: 40px; animation: spin 2s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .modal { transition: opacity 0.25s ease; }
-        .modal-content { transition: transform 0.25s ease; }
-        
-        /* --- 新增样式：用于长文本截断和“展开”按钮 --- */
-        .line-clamp-2 {
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
-        }
-        .line-clamp-none {
-            -webkit-line-clamp: unset;
-        }
-        .copy-toast {
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-        }
 
-        @media (max-width: 767px) {
-            .table-container { max-height: none; overflow-y: visible; }
-            .responsive-table thead { display: none; }
-            .responsive-table tbody, .responsive-table tr, .responsive-table td { display: block; width: 100%; }
-            .responsive-table tr { margin-bottom: 1rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); }
-            .responsive-table td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; text-align: right; border-bottom: 1px solid #f1f5f9; }
-            .responsive-table tr:last-child { margin-bottom: 0; }
-            .responsive-table td:last-child { border-bottom: none; }
-            .responsive-table td::before { content: attr(data-label); font-weight: 600; text-align: left; margin-right: 1rem; color: #475569; flex-shrink: 0; }
-            .responsive-table td.action-cell { justify-content: center; padding: 1rem; background-color: #f8fafc; }
-            .responsive-table td.action-cell::before { display: none; }
-            .responsive-table .truncate { white-space: normal; }
+<style>
+    body { 
+        font-family: 'Inter', 'Noto Sans SC', sans-serif; 
+        background-color: #f8fafc; 
+    }
+    .table-container { 
+        max-height: 65vh; 
+        overflow-y: auto; 
+    }
+    .table-container::-webkit-scrollbar { width: 8px; height: 8px; }
+    .table-container::-webkit-scrollbar-track { background: #f1f1f1; }
+    .table-container::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+    .table-container::-webkit-scrollbar-thumb:hover { background: #555; }
+    thead th { 
+        position: sticky; 
+        top: 0; 
+        background-color: #f1f5f9; 
+        z-index: 10; 
+    }
+    .loader { 
+        border: 4px solid #f3f3f3; 
+        border-radius: 50%; 
+        border-top: 4px solid #3498db; 
+        width: 40px; 
+        height: 40px; 
+        animation: spin 2s linear infinite; 
+    }
+    @keyframes spin { 
+        0% { transform: rotate(0deg); } 
+        100% { transform: rotate(360deg); } 
+    }
+    .modal { transition: opacity 0.25s ease; }
+    .modal-content { transition: transform 0.25s ease; }
+    
+    /* 文本截断 & 展开按钮 */
+    .line-clamp-2 {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+    .line-clamp-none { -webkit-line-clamp: unset; }
+
+    .copy-toast {
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    }
+
+    /* === 统一按钮风格 === */
+    .btn-action {
+        flex: 1;
+        min-width: 80px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-image {
+        background-color: #f1f5f9;
+        color: #1e293b;
+        border: 1px solid #cbd5e1;
+    }
+    .btn-image:hover {
+        background-color: #e2e8f0;
+    }
+
+    .btn-details {
+        background-color: #0284c7;
+        color: white;
+        border: 1px solid #0284c7;
+    }
+    .btn-details:hover {
+        background-color: #0369a1;
+    }
+
+    /* === 移动端两列卡片布局 === */
+    @media (max-width: 767px) {
+        .table-container { max-height: none; overflow: visible; }
+        .responsive-table { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 0.75rem; 
         }
-    </style>
+        .responsive-table thead { display: none; }
+        .responsive-table tbody { display: contents; }
+        .responsive-table tr {
+            display: block;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .responsive-table td {
+            display: block;
+            font-size: 0.75rem;
+            color: #334155;
+            padding: 0.15rem 0;
+        }
+        .responsive-table td strong {
+            display: inline-block;
+            min-width: 4em;
+            color: #475569;
+        }
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.75rem;
+            gap: 0.5rem;
+        }
+        /* 移动端按钮宽度自适应修复 */
+        .btn-action {
+            min-width: auto;
+            flex-shrink: 1; /* 允许按钮在必要时收缩 */
+        }
+    }
+</style>
+
 </head>
 <body class="antialiased text-slate-700">
 
@@ -452,74 +530,99 @@
         }
         
         // --- 渲染与显示函数 ---
-        function renderTable(products, displayColumns) {
-            currentDisplayProducts = products;
-            tableHeader.innerHTML = '';
-            tableBody.innerHTML = '';
+function renderTable(products, displayColumns) {
+    tableHeader.innerHTML = '';
+    tableBody.innerHTML = '';
 
-            if (!products || products.length === 0) {
-                messageCenter.classList.remove('hidden');
-                loader.classList.add('hidden');
-                messageTitle.textContent = '未能找到结果';
-                messageText.textContent = '请尝试使用其他关键词进行搜索。';
-                exportButton.classList.add('hidden');
-                sortButton.classList.add('hidden');
-                return;
-            }
-            
-            messageCenter.classList.add('hidden');
-            exportButton.classList.remove('hidden');
-            sortButton.classList.remove('hidden'); 
+    if (!products || products.length === 0) {
+        messageCenter.classList.remove('hidden');
+        loader?.classList.add('hidden');
+        messageTitle.textContent = '未能找到结果';
+        messageText.textContent = '请尝试使用其他关键词进行搜索。';
+        exportButton?.classList.add('hidden');
+        sortButton?.classList.add('hidden');
+        return;
+    }
 
-            const headerRow = document.createElement('tr');
+    messageCenter.classList.add('hidden');
+    exportButton?.classList.remove('hidden');
+    sortButton?.classList.remove('hidden');
+
+    const isMobile = window.innerWidth < 768;
+
+    if (!isMobile) {
+        // === 桌面端表格头部 ===
+        const headerRow = document.createElement('tr');
+        displayColumns.forEach(colName => {
+            const th = document.createElement('th');
+            th.className = 'px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider';
+            th.textContent = colName;
+            headerRow.appendChild(th);
+        });
+        const actionTh = document.createElement('th');
+        actionTh.className = 'px-4 py-3 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider';
+        actionTh.textContent = '操作';
+        headerRow.appendChild(actionTh);
+        tableHeader.appendChild(headerRow);
+    }
+
+    products.forEach((product) => {
+        const row = document.createElement('tr');
+
+        if (isMobile) {
+            // === 移动端两列卡片 ===
+            const brand = product['品牌'] || '';
+            const category = product['小类'] || '';
+            const model = product['产品型号'] || '';
+            const price1 = product['开单价'] ? `¥${product['开单价']}` : '';
+            const price2 = product['代发价'] ? `¥${product['代发价']}` : '';
+            const price3 = product['零售价'] ? `¥${product['零售价']}` : '';
+            const stock = product['库存'] || '';
+
+            row.innerHTML = `
+    		<td><strong>品牌:</strong> ${brand}</td>
+    		<td><strong>小类:</strong> ${category}</td>
+    		<td><strong>型号:</strong> ${model}</td>
+    		<td><strong>开单价:</strong> ${price1}</td>
+    		<td><strong>代发价:</strong> ${price2}</td>
+    		<td><strong>零售价:</strong> ${price3}</td>
+    		<td><strong>库存:</strong> ${stock}</td>
+    		<td>
+        		<div class="card-actions">
+            		<button data-image-url="${product['产品缩略图URL'] || ''}" class="btn-action btn-image view-image-btn">查看图片</button>
+            		<button data-id="${product['序号']}" class="btn-action btn-details view-details-btn">查看详情</button>
+        		</div>
+    		</td>
+		`;
+        } else {
+            // === 桌面端表格 ===
             displayColumns.forEach(colName => {
-                const th = document.createElement('th');
-                th.className = 'px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider';
-                th.textContent = colName;
-                headerRow.appendChild(th);
+                const td = document.createElement('td');
+                td.className = 'px-4 py-4 text-sm text-slate-600 break-words';
+                const cellValue = product[colName] || '';
+                td.textContent = ['开单价','代发价','零售价'].includes(colName) && cellValue ? `¥${cellValue}` : cellValue;
+                row.appendChild(td);
             });
-            const actionTh = document.createElement('th');
-            actionTh.className = 'px-4 py-3 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider';
-            actionTh.textContent = '操作';
-            headerRow.appendChild(actionTh);
-            tableHeader.appendChild(headerRow);
 
-            products.forEach((product) => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-slate-50 transition duration-150 ease-in-out';
-                
-                displayColumns.forEach(colName => {
-                    const td = document.createElement('td');
-                    td.setAttribute('data-label', colName);
-                    td.className = 'px-4 py-4 text-sm text-slate-600 break-words';
-                    const cellValue = (product[colName] === null || product[colName] === undefined) ? '' : product[colName];
-                    
-                    if (colName === '产品型号' && product['产品缩略图URL']) {
-                        td.innerHTML = `<a href="#" data-image-url="${product['产品缩略图URL']}" class="view-image-btn text-sky-600 hover:text-sky-800 hover:underline">${cellValue}</a>`;
-                    } else {
-                        let displayValue = cellValue;
-                        if (['开单价', '代发价', '零售价'].includes(colName) && cellValue) {
-                           displayValue = `¥${cellValue}`;
-                        }
-                        td.textContent = displayValue;
-                        td.title = displayValue; 
-                        if (['核心参数'].includes(colName)) {
-                            td.classList.add('truncate');
-                        }
-                    }
-                    row.appendChild(td);
-                });
+            const actionTd = document.createElement('td');
+		actionTd.className = 'px-4 py-4 whitespace-nowrap text-sm text-center';
+		actionTd.innerHTML = `
+    		<!-- 使用flex-col类实现垂直布局 -->
+    		<div class="flex flex-col items-center gap-2">
+        		<button data-image-url="${product['产品缩略图URL'] || ''}" class="btn-action btn-image view-image-btn w-full">查看图片</button>
+        		<button data-id="${product['序号']}" class="btn-action btn-details view-details-btn w-full">查看详情</button>
+    		</div>
+		`;
+		row.appendChild(actionTd);
 
-                const actionTd = document.createElement('td');
-                actionTd.setAttribute('data-label', '操作');
-                actionTd.classList.add('action-cell');
-                actionTd.className += ' px-4 py-4 whitespace-nowrap text-sm text-center';
-                actionTd.innerHTML = `<button data-id="${product['序号']}" class="view-details-btn text-sky-600 hover:text-sky-800 font-semibold py-2 px-4 rounded-md w-full bg-white border border-slate-300 hover:bg-slate-50">查看详情</button>`;
-                row.appendChild(actionTd);
-                tableBody.appendChild(row);
-            });
-            statsDiv.textContent = `查询到 ${products.length} 条相关记录。`;
         }
+
+        tableBody.appendChild(row);
+    });
+
+    statsDiv.textContent = `查询到 ${products.length} 条相关记录。`;
+}
+
         
         function showProductDetails(product) {
             modalTitle.textContent = `${product['品牌'] || ''} - ${product['产品型号'] || '产品详情'}`;
