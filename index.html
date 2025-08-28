@@ -274,7 +274,7 @@
             '渠道属性', '条形码', '产品颜色', '容量', '深度', '宽度', '高度', '包装尺寸', '包装体积', '毛重',
             '箱规', '功率', '能效等级', '库存', '开单价', '代发价', '零售价', '毛利空间',
             '评论数', '京东链接', '是否自营', '主仓库', '是否退市', '3C图片', '质检图片', 
-            '产品缩略图URL', '图片资料包', '产品负责人'
+            '产品缩略图URL', '图片资料包', '京东链接'
         ];
         
         // =========================================================================
@@ -589,8 +589,8 @@ function renderTable(products, displayColumns) {
     		<td><strong>库存:</strong> ${stock}</td>
     		<td>
         		<div class="card-actions">
-            		<button data-image-url="${product['产品缩略图URL'] || ''}" class="btn-action btn-image view-image-btn">查看图片</button>
-            		<button data-id="${product['序号']}" class="btn-action btn-details view-details-btn">查看详情</button>
+            		<button data-image-url="${product['产品缩略图URL'] || ''}" class="btn-action btn-image view-image-btn">看图片</button>
+            		<button data-id="${product['序号']}" class="btn-action btn-details view-details-btn">看详情</button>
         		</div>
     		</td>
 		`;
@@ -609,8 +609,8 @@ function renderTable(products, displayColumns) {
 		actionTd.innerHTML = `
     		<!-- 使用flex-col类实现垂直布局 -->
     		<div class="flex flex-col items-center gap-2">
-        		<button data-image-url="${product['产品缩略图URL'] || ''}" class="btn-action btn-image view-image-btn w-full">查看图片</button>
-        		<button data-id="${product['序号']}" class="btn-action btn-details view-details-btn w-full">查看详情</button>
+        		<button data-image-url="${product['产品缩略图URL'] || ''}" class="btn-action btn-image view-image-btn w-full">看图片</button>
+        		<button data-id="${product['序号']}" class="btn-action btn-details view-details-btn w-full">看详情</button>
     		</div>
 		`;
 		row.appendChild(actionTd);
@@ -641,7 +641,7 @@ function renderTable(products, displayColumns) {
                             <button class="toggle-clamp-btn text-xs text-sky-600 font-semibold mt-1 hover:underline">展开</button>
                         </div>`;
                 } else if (URL_FIELDS.includes(key)) {
-                    const buttonText = key.includes('URL') ? '查看图片' : (key.includes('资料包') ? '下载资料包' : '打开链接');
+                    const buttonText = key.includes('URL') ? '看图片' : (key.includes('资料包') ? '下载资料包' : '打开链接');
                     valueHtml = `
                         <div class="flex items-center space-x-2 mt-1">
                             <a href="${valueStr}" target="_blank" rel="noopener noreferrer" 
