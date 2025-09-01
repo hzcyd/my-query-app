@@ -265,16 +265,16 @@
         const DETAILS_API_ENDPOINT = `${BASE_API_URL}/details`;
 
         const VISIBLE_COLUMNS = [
-            '品牌', '小类', '产品型号', '开单价', '代发价', '零售价', 
+            '品牌', '小类', '产品型号', '开单价', '代发价', '毛利空间', 
             '核心参数', '库存', '主仓库'
         ];
 
         const DB_COLUMN_ORDER = [
-            '序号', '品牌', '所属事业部', '大类', '小类', '产品型号', '产品卖点', '核心参数',
-            '渠道属性', '条形码', '产品颜色', '容量', '深度', '宽度', '高度', '包装尺寸', '包装体积', '毛重',
-            '箱规', '功率', '能效等级', '库存', '开单价', '代发价', '零售价', '毛利空间',
-            '评论数', '京东链接', '是否自营', '主仓库', '是否退市', '3C图片', '质检图片', 
-            '产品缩略图URL', '图片资料包', '京东链接'
+            '序号', '品牌', '所属事业部', '大类', '小类', '产品型号', '渠道属性', '库存',
+            '开单价', '代发价', '主仓库', '是否退市', '核心参数', '容量', '功率', '能效等级', '条形码', '产品卖点',
+            '产品颜色', '深度', '宽度', '高度', '包装尺寸', '包装体积', '毛重', '箱规',
+            '零售价', '毛利空间', '评论数', '京东链接', '是否自营', '3C图片', '质检图片', 
+            '产品缩略图URL', '图片资料包', '产品负责人'
         ];
         
         // =========================================================================
@@ -576,7 +576,7 @@ function renderTable(products, displayColumns) {
             const model = product['产品型号'] || '';
             const price1 = product['开单价'] ? `¥${product['开单价']}` : '';
             const price2 = product['代发价'] ? `¥${product['代发价']}` : '';
-            const price3 = product['零售价'] ? `¥${product['零售价']}` : '';
+            const grossMargin = product['毛利空间'] || ''; // 已将 price3 (零售价) 替换为毛利空间
             const stock = product['库存'] || '';
 
             row.innerHTML = `
@@ -585,7 +585,7 @@ function renderTable(products, displayColumns) {
     		<td><strong>型号:</strong> ${model}</td>
     		<td><strong>开单价:</strong> ${price1}</td>
     		<td><strong>代发价:</strong> ${price2}</td>
-    		<td><strong>零售价:</strong> ${price3}</td>
+    		<td><strong>毛利空间:</strong> ${grossMargin}</td>
     		<td><strong>库存:</strong> ${stock}</td>
     		<td>
         		<div class="card-actions">
