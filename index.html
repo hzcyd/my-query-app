@@ -576,7 +576,12 @@ function renderTable(products, displayColumns) {
             const model = product['产品型号'] || '';
             const price1 = product['开单价'] ? `¥${product['开单价']}` : '';
             const price2 = product['代发价'] ? `¥${product['代发价']}` : '';
-            const grossMargin = product['毛利空间'] || ''; // 已将 price3 (零售价) 替换为毛利空间
+			// 【修改点 1】: 移动端毛利空间格式化
+			const rawGrossMargin = product['毛利空间'];
+			let grossMargin = '';
+			if (rawGrossMargin !== null && !isNaN(parseFloat(rawGrossMargin))) {
+   			 grossMargin = `${(parseFloat(rawGrossMargin) * 100).toFixed(0)}%`;
+			}
             const stock = product['库存'] || '';
 
             row.innerHTML = `
@@ -599,8 +604,16 @@ function renderTable(products, displayColumns) {
             displayColumns.forEach(colName => {
                 const td = document.createElement('td');
                 td.className = 'px-4 py-4 text-sm text-slate-600 break-words';
-                const cellValue = product[colName] || '';
-                td.textContent = ['开单价','代发价','零售价'].includes(colName) && cellValue ? `¥${cellValue}` : cellValue;
+				const cellValue = product[colName];
+
+				// 【修改点 2】: 桌面端增加对“毛利空间”的特别处理
+				if (colName === '毛利空间' && cellValue !== null && !isNaN(parseFloat(cellValue))) {
+    				td.textContent = `${(parseFloat(cellValue) * 100).toFixed(0)}%`;
+				} else if (['开单价','代发价','零售价'].includes(colName) && cellValue) {
+   				 td.textContent = `¥${cellValue}`;
+				} else {
+   				 td.textContent = cellValue || '';
+				}
                 row.appendChild(td);
             });
 
